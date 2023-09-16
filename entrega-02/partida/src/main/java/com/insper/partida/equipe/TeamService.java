@@ -2,6 +2,9 @@ package com.insper.partida.equipe;
 
 import com.insper.partida.equipe.dto.SaveTeamDTO;
 import com.insper.partida.equipe.dto.TeamReturnDTO;
+
+import com.insper.partida.tabela.Tabela;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +23,25 @@ public class  TeamService {
     }
 
     public TeamReturnDTO saveTeam(SaveTeamDTO saveTeam) {
-        Team team = new Team();
-        team.setName(saveTeam.getName());
-        team.setIdentifier(saveTeam.getIdentifier());
+        if (teamRepository.findByIdentifier(saveTeam.getIdentifier()) == null) {
+            Team team = new Team();
+            team.setIdentifier(saveTeam.getIdentifier());
+            team.setName(saveTeam.getName());
+            teamRepository.save(team);
 
-        team = teamRepository.save(team);
-        return  TeamReturnDTO.covert(team);
+            Tabela tabela = new Tabela();
+            tabela.setNome(saveTeam.getName());
+            tabela.setPontos(0);
+            tabela.setGolsPro(0);
+            tabela.setGolsContra(0);
+            tabela.setVitorias(0);
+            tabela.setDerrotas(0);
+            tabela.setEmpates(0);
+            tabela.setJogos(0);
+            
+            return TeamReturnDTO.covert(team);
+        }
+        return null;
     }
 
 

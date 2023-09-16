@@ -7,6 +7,8 @@ import com.insper.partida.equipe.dto.TeamReturnDTO;
 import com.insper.partida.game.dto.EditGameDTO;
 import com.insper.partida.game.dto.GameReturnDTO;
 import com.insper.partida.game.dto.SaveGameDTO;
+import com.insper.partida.tabela.Tabela;
+import com.insper.partida.tabela.TabelaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,9 @@ public class GameService {
 
     @Autowired
     private TeamService teamService;
+
+    @Autowired
+    private TabelaRepository tabelaRepository;
 
     public Page<GameReturnDTO> listGames(String home, String away, Integer attendance, Pageable pageable) {
         if (home != null && away != null) {
@@ -75,6 +80,35 @@ public class GameService {
         gameBD.setScoreHome(editGameDTO.getScoreHome());
         gameBD.setAttendance(editGameDTO.getAttendance());
         gameBD.setStatus("FINISHED");
+
+        Tabela tabelaHome = tabelaRepository.findByNome(gameBD.getHome());
+        Tabela tabelaAway = tabelaRepository.findByNome(gameBD.getAway());
+
+        tabelaHome.setGolsPro(tabelaHome.getGolsPro() + editGameDTO.getScoreHome());
+        tabelaHome.setGolsContra(tabelaHome.getGolsContra() + editGameDTO.getScoreAway());
+        tabelaHome.setJogos(tabelaHome.getJogos() + 1);
+
+        tabelaAway.setGolsPro(tabelaAway.getGolsPro() + editGameDTO.getScoreAway());
+        tabelaAway.setGolsContra(tabelaAway.getGolsContra() + editGameDTO.getScoreHome());
+        tabelaAway.setJogos(tabelaAway.getJogos() + 1);
+
+        if (editGameDTO.getScoreAway() == editGameDTO.getScoreHome()) {
+            tabelaHome.setEmpates(tabelaHome.getEmpates() + 1);
+            tabelaAway.setEmpates(tabelaAway.getEmpates() + 1);
+            tabelaHome.setPontos(tabelaHome.getPontos() + 1);
+            tabelaAway.setPontos(tabelaAway.getPontos() + 1);
+        } else if (editGameDTO.getScoreAway() > editGameDTO.getScoreHome()) {
+            tabelaAway.setVitorias(tabelaAway.getVitorias() + 1);
+            tabelaHome.setDerrotas(tabelaHome.getDerrotas() + 1);
+            tabelaAway.setPontos(tabelaAway.getPontos() + 3);
+        } else {
+            tabelaHome.setVitorias(tabelaHome.getVitorias() + 1);
+            tabelaAway.setDerrotas(tabelaAway.getDerrotas() + 1);
+            tabelaHome.setPontos(tabelaHome.getPontos() + 3);
+        }
+
+        tabelaRepository.save(tabelaHome);
+        tabelaRepository.save(tabelaAway);
 
         Game game = gameRepository.save(gameBD);
         return GameReturnDTO.covert(game);
