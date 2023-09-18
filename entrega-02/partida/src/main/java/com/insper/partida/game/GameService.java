@@ -82,7 +82,16 @@ public class GameService {
         gameBD.setStatus("FINISHED");
 
         Tabela tabelaHome = tabelaRepository.findByNome(gameBD.getHome());
+        if (tabelaHome == null) {
+            tabelaHome = new Tabela();
+            tabelaHome.setNome(gameBD.getHome());
+        }
+
         Tabela tabelaAway = tabelaRepository.findByNome(gameBD.getAway());
+        if (tabelaAway == null) {
+            tabelaAway = new Tabela();
+            tabelaAway.setNome(gameBD.getAway());
+        }
 
         tabelaHome.setGolsPro(tabelaHome.getGolsPro() + editGameDTO.getScoreHome());
         tabelaHome.setGolsContra(tabelaHome.getGolsContra() + editGameDTO.getScoreAway());
@@ -159,6 +168,7 @@ public class GameService {
             }
 
             Game game = new Game();
+            game.setIdentifier(UUID.randomUUID().toString());
             game.setHome(teams[team1]);
             game.setAway(teams[team2]);
             game.setScoreHome(new Random().nextInt(4));
@@ -166,12 +176,19 @@ public class GameService {
             game.setStadium(teams[team1]);
             game.setAttendance(new Random().nextInt(4) * 1000);
 
-            //gameRepository.save(game);
-            games.add(game);
-
+            gameRepository.save(game);
+            
+            EditGameDTO editGameDTO = new EditGameDTO();
+            editGameDTO.setScoreAway(game.getScoreAway());
+            editGameDTO.setScoreHome(game.getScoreHome());
+            editGameDTO.setAttendance(game.getAttendance());
+            this.editGame(game.getIdentifier(), editGameDTO);
+            // games.add(game);
+            
+            
         }
 
-        gameRepository.saveAll(games);
+        // gameRepository.saveAll(games);
 
 
     }

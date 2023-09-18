@@ -22,8 +22,8 @@ public class TabelaController {
     }
 
     @GetMapping("/{nome}")
-    public TabelaReturnDTO getTabelaByNome(@PathVariable String nome) {
-        return TabelaReturnDTO.covert(tabelaService.getTabelaByNome(nome));
+    public Tabela getTabelaByNome(@PathVariable String nome) {
+        return tabelaService.getTabelaByNome(nome);
     }
 
     @PostMapping
