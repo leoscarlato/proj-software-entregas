@@ -1,8 +1,6 @@
 package com.insper.partida.tabela;
 
 import com.insper.partida.equipe.TeamService;
-import com.insper.partida.equipe.dto.TeamReturnDTO;
-import com.insper.partida.game.Game;
 import com.insper.partida.game.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +29,8 @@ public class TabelaService {
     }
 
 
-    public Tabela getTabelaByIdentifier(String identifier) {
-        return tabelaRepository.findByIdentifier(identifier);
+    public Tabela getTabelaByNome(String nome) {
+        return tabelaRepository.findByNome(nome);
     }
 
     public Tabela saveTabela(Tabela tabela) {
